@@ -1,5 +1,6 @@
 import http from 'http'
 import url from 'url'
+import { StringDecoder } from 'string_decoder'
 
 const server = http.createServer((request, response) => {
   const parsedUrl = url.parse(request.url, true)
@@ -9,11 +10,28 @@ const server = http.createServer((request, response) => {
   const queryStringObject = parsedUrl.query
   const headers = request.headers
 
-  response.end('Hello!\n')
+  // Payload
+  const decoder = new StringDecoder('utf-8')
+  let buffer = ''
 
-  console.log(`Request received on path: ${trimmedPath} and method: ${method}`)
-  console.log(queryStringObject)
-  console.log(headers)
+  request.on('data', data => {
+    buffer += decoder.write(data)
+  })
+
+  request.on('end', () => {
+    buffer += decoder.end()
+
+    response.end('Hello!\n')
+
+    console.log(
+      `Request received on path: ${trimmedPath} and method: ${method}`
+    )
+    console.log('Query string object: ')
+    console.log(queryStringObject)
+    console.log('Headers: ')
+    console.log(headers)
+    console.log(`Payload: ${buffer}`)
+  })
 })
 
 server.listen(3000, () => {
