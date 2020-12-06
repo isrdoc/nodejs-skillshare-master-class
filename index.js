@@ -7,11 +7,13 @@ const server = http.createServer((request, response) => {
   const trimmedPath = path.replace(/^\/+|\/+$/g, '')
   const method = request.method.toUpperCase()
   const queryStringObject = parsedUrl.query
+  const headers = request.headers
 
   response.end('Hello!\n')
 
   console.log(`Request received on path: ${trimmedPath} and method: ${method}`)
   console.log(queryStringObject)
+  console.log(headers)
 })
 
 server.listen(3000, () => {
